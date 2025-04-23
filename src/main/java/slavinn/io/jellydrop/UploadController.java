@@ -12,41 +12,37 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.ui.Model;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Controller
 public class UploadController {
-
 	@GetMapping("/")
 	public String home() {
 		return "upload";
 	}
 
 	@PostMapping("/upload")
-	public ResponseEntity<?> handleFileUplaod(@RequestParam("file") MultipartFile file) {
+	public ResponseEntity<?> handleFileUplaod(@RequestParam("file") MultipartFile file,
+			@RequestParam("contentType") String contentType) {
 		Path tempFile = Paths.get("/tmp/" + file.getOriginalFilename());
+		String destinationFolder = getDestinationFolder(contentType);
 		try {
 			file.transferTo(tempFile);
-			return ResponseEntity.ok("File uploaded successfully");
-		} catch (IOException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading file");
-		}
-	}
 
-	@PostMapping("/submit-upload")
-	public ResponseEntity<?> saveFile(@RequestParam("filename") String filename,
-			@RequestParam("contentType") String contentType) {
-		// Determine the destination folder based on the content type
-		String destinationFolder = getDestinationFolder(contentType);
-		// Logic to move file from temp storage to NFS server
-		try {
-			Files.move(Paths.get("/tmp/" + filename), Paths.get(destinationFolder));
-			return ResponseEntity.ok("File moved to appropriate folder");
+			Files.move(Paths.get(tempFile.toString()), Paths.get(destinationFolder));
+			return ResponseEntity.ok("File uploaded and saved successfully.");
 		} catch (IOException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving file");
+			if (!Files.exists(tempFile)) {
+
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body("Error uploading file");
+			} else {
+
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body("Error saving file");
+			}
 		}
 	}
 
@@ -62,5 +58,4 @@ public class UploadController {
 				return "/exports/others/";
 		}
 	}
-
 }

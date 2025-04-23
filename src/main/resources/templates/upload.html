@@ -11,31 +11,58 @@
 
 <body>
 	<h2>Upload Media Files</h2>
+
 	<form action="/upload" method="post" enctype="multipart/form-data" class="dropzone" id="file-upload">
 		<div class="fallback">
 			<input name="file" type="file" multiple />
 		</div>
-	</form>
-	<form method="post" action="/submit-upload">
+
 		<label for="contentType">Select Content Type:</label>
 		<select name="contentType" id="contentType">
 			<option value="movie">Movie</option>
 			<option value="song">Song</option>
 			<option value="show">TV Show</option>
 		</select>
-		<button type="submit">Save</button>
+
+		<!-- Manual upload button -->
+		<button type="button" id="upload-button">Upload</button>
 	</form>
 
 	<script>
+		let dz;
 		Dropzone.options.fileUpload = {
 			url: '/upload',
+			autoProcessQueue: false,
 			paramName: 'file',
-			maxFilesize: 10, // MB
-			acceptedFiles: '.mp4, .mp3, .mkv, .avi', // Allowing movie and music files
-			success: function (file, response) {
-				console.log('File uploaded successfully:', response);
+			maxFilesize: 10240, // MB (10GB)
+			acceptedFiles: '.mp4,.mp3,.mkv,.avi',
+			init: function () {
+				dz = this;
+
+				this.on("sending", function (file, xhr, formData) {
+					const contentType = document.getElementById("contentType").value;
+					formData.append("contentType", contentType);
+				});
+
+				this.on("success", function (file, response) {
+					console.log("Upload success:", response);
+					alert(response);
+				});
+
+				this.on("error", function (file, errorMessage) {
+					console.error(" Upload error:", errorMessage);
+					alert("Upload failed: " + errorMessage);
+				});
 			}
 		};
+
+		document.getElementById("upload-button").addEventListener("click", function () {
+			if (dz.getQueuedFiles().length === 0) {
+				alert("Please add a file first.");
+			} else {
+				dz.processQueue();
+			}
+		});
 	</script>
 </body>
 
