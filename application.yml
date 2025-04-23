@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10GB
+      max-request-size: 10GB
+  web:
+    resources:
+      static-locations: file:/exports/jellyfin  # Serves uploaded files if needed
+
+media:
+  upload-dir: /exports/jellyfin # Folder on the NFS share
+
+logging:
+  file:
+    name: /opt/jellydrop/logs/app.log
+  level:
+    root: INFO
+    com.yourapp: DEBUG
