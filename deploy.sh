@@ -11,6 +11,6 @@ echo "[INFO] Building JAR..." | tee -a deploy.log
 ./mvnw clean package -DskipTests || exit 1
 
 echo "[INFO] Restarting service..." | tee -a deploy.log
-sudo systemctl restart media-uploader
+sudo systemctl restart jellydrop
 
 echo "[SUCCESS] Deployed at $(date)" | tee -a deploy.log
