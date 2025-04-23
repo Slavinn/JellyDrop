@@ -42,13 +42,13 @@ public class UploadController {
 			return ResponseEntity.ok(response);
 		} catch (IOException e) {
 			if (!Files.exists(tempFile)) {
-
+				response.put("error", "Error uploading file");
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-						.body("Error uploading file");
+						.body(response);
 			} else {
-
+				response.put("error", "Error saving file");
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-						.body("Error saving file");
+						.body(response);
 			}
 		}
 	}
