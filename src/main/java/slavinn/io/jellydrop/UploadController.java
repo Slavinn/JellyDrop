@@ -15,6 +15,8 @@ import org.springframework.ui.Model;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class UploadController {
@@ -26,13 +28,18 @@ public class UploadController {
 	@PostMapping("/upload")
 	public ResponseEntity<?> handleFileUplaod(@RequestParam("file") MultipartFile file,
 			@RequestParam("contentType") String contentType) {
+		Map<String, String> response = new HashMap<>();
+
 		Path tempFile = Paths.get("/tmp/" + file.getOriginalFilename());
-		String destinationFolder = getDestinationFolder(contentType);
 		try {
 			file.transferTo(tempFile);
 
+			String destinationFolder = getDestinationFolder(contentType);
 			Files.move(Paths.get(tempFile.toString()), Paths.get(destinationFolder));
-			return ResponseEntity.ok("File uploaded and saved successfully.");
+
+			response.put("message", "File uploaded and saved successfully.");
+
+			return ResponseEntity.ok(response);
 		} catch (IOException e) {
 			if (!Files.exists(tempFile)) {
 
