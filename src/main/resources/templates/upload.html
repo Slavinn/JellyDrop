@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Upload Files</title>
+	<link href="https://cdn.jsdelivr.net/npm/dropzone@5.7.0/dist/min/dropzone.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/dropzone@5.7.0/dist/min/dropzone.min.js"></script>
+</head>
+
+<body>
+	<h2>Upload Media Files</h2>
+	<form action="/upload" method="post" enctype="multipart/form-data" class="dropzone" id="file-upload">
+		<div class="fallback">
+			<input name="file" type="file" multiple />
+		</div>
+	</form>
+	<form method="post" action="/submit-upload">
+		<label for="contentType">Select Content Type:</label>
+		<select name="contentType" id="contentType">
+			<option value="movie">Movie</option>
+			<option value="song">Song</option>
+			<option value="show">TV Show</option>
+		</select>
+		<button type="submit">Save</button>
+	</form>
+
+	<script>
+		Dropzone.options.fileUpload = {
+			url: '/upload',
+			paramName: 'file',
+			maxFilesize: 10, // MB
+			acceptedFiles: '.mp4, .mp3, .mkv, .avi', // Allowing movie and music files
+			success: function (file, response) {
+				console.log('File uploaded successfully:', response);
+			}
+		};
+	</script>
+</body>
+
+</html>
