@@ -16,6 +16,6 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /opt/media-uploader
+            cd /opt/jellydrop
             ./deploy.sh
 
