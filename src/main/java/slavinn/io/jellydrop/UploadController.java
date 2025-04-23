@@ -37,12 +37,13 @@ public class UploadController {
 	}
 
 	@PostMapping("/submit-upload")
-	public ResponseEntity<?> saveFile(@RequestParam("contentType") String contentType) {
+	public ResponseEntity<?> saveFile(@RequestParam("filename") String filename,
+			@RequestParam("contentType") String contentType) {
 		// Determine the destination folder based on the content type
 		String destinationFolder = getDestinationFolder(contentType);
 		// Logic to move file from temp storage to NFS server
 		try {
-			Files.move(Paths.get("/tmp/" + "uploadedFile.mp4"), Paths.get(destinationFolder));
+			Files.move(Paths.get("/tmp/" + filename), Paths.get(destinationFolder));
 			return ResponseEntity.ok("File moved to appropriate folder");
 		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving file");
