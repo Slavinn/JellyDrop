@@ -2,6 +2,7 @@ package slavinn.io.jellydrop;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -20,12 +21,17 @@ import java.util.Map;
 
 @Controller
 public class UploadController {
+
+	@Autowired
+	private MediaPaths mediaPaths;
+
 	@GetMapping("/")
 	public String home() {
 		return "upload";
 	}
 
 	@PostMapping("/upload")
+
 	public ResponseEntity<?> handleFileUplaod(@RequestParam("file") MultipartFile file,
 			@RequestParam("contentType") String contentType) {
 		Map<String, String> response = new HashMap<>();
@@ -33,10 +39,15 @@ public class UploadController {
 		Path tempFile = Paths.get("/tmp/" + file.getOriginalFilename());
 		try {
 			file.transferTo(tempFile);
+			System.out.println(tempFile);
+
+			System.out.println(contentType);
 
 			String destinationFolder = getDestinationFolder(contentType);
-			Files.move(Paths.get(tempFile.toString()), Paths.get(destinationFolder));
-
+			// Files.move(Paths.get(tempFile.toString()), Paths.get(destinationFolder));
+			System.out.println(destinationFolder);
+			System.out.println(Paths.get(tempFile.toString()));
+			System.out.println(Paths.get(destinationFolder));
 			response.put("message", "File uploaded and saved successfully.");
 
 			return ResponseEntity.ok(response);
@@ -56,13 +67,13 @@ public class UploadController {
 	private String getDestinationFolder(String contentType) {
 		switch (contentType) {
 			case "movie":
-				return "/exports/jellyfin/Movies/";
+				return mediaPaths.getMovies();
 			case "song":
-				return "/exports/jellyfind/Music/";
+				return mediaPaths.getSongs();
 			case "show":
-				return "/exports/jellyfin/Shows/";
+				return mediaPaths.getShows();
 			default:
-				return "/exports/others/";
+				throw new IllegalArgumentException("Invalid content type");
 		}
 	}
 }
