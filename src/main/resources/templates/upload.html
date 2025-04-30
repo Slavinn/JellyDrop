@@ -40,8 +40,8 @@
 				dz = this;
 
 				this.on("sending", function (file, xhr, formData) {
-					const contentType = document.getElementById("contentType").value;
-					formData.append("contentType", contentType);
+					//const contentType = document.getElementById("contentType").value;
+					//formData.append("contentType", contentType);
 				});
 
 				this.on("success", function (file, response) {
@@ -52,17 +52,21 @@
 					if (xhr && xhr.responseText) {
 						try {
 							const json = JSON.parse(xhr.responseText);
-							console.error("Upload error:", json.error || json.message || errorMessage);
-							alert("Upload failed: " + (json.error || json.message || errorMessage));
+							const msg = json?.error || json?.message || errorMessage;
+							console.error("Upload error:", msg);
+							alert("Upload failed: " + msg);
 						} catch (e) {
-							console.error("Upload error (non-JSON):", errorMessage);
-							alert("Upload failed: " + errorMessage);
+							console.error("Upload error: Invalid JSON response", xhr.responseText);
+							alert("Upload failed: Invalid server response.");
 						}
 					} else {
-						console.error("Upload error (no xhr):", errorMessage);
+						console.error("Upload error:", errorMessage);
 						alert("Upload failed: " + errorMessage);
 					}
 				});
+				this.removeFile(file);
+
+
 			}
 		};
 

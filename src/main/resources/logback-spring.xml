@@ -1,38 +1,59 @@
-<configuration>
+<configuration scan="true">
 
-	<springProfile name="!test">
-		<property name="LOG_PATH" value="/opt/jellydrop/logs" />
+	<!-- Global settings -->
+	<property name="LOG_PATTERN"
+		value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n" />
+	<property name="LOG_DIR" value="logs" />
 
-		<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-			<file>${LOG_PATH}/app.log</file>
-			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-				<fileNamePattern>${LOG_PATH}/app.%d{yyyy-MM-dd}.log</fileNamePattern>
-				<maxHistory>30</maxHistory>
-			</rollingPolicy>
-			<encoder>
-				<pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} -
-					%msg%n</pattern>
-			</encoder>
-		</appender>
+	<!-- Default root logger -->
+	<root level="INFO">
+		<appender-ref ref="Console" />
+	</root>
 
-		<root level="INFO">
-			<appender-ref ref="FILE" />
-		</root>
+	<!-- Console appender -->
+	<appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+	<!-- Dev profile -->
+	<springProfile name="dev">
+		<logger name="slavinn.io.jellydrop" level="DEBUG" />
 	</springProfile>
 
+	<!-- Test profile -->
 	<springProfile name="test">
-		<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+			<file>${LOG_DIR}/jellydrop-test.log</file>
+			<append>true</append>
 			<encoder>
-				<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+				<pattern>${LOG_PATTERN}</pattern>
 			</encoder>
 		</appender>
 
 		<root level="DEBUG">
-			<appender-ref ref="CONSOLE" />
+			<appender-ref ref="FILE" />
 		</root>
 	</springProfile>
 
-	<logger name="com.yourapp" level="DEBUG" />
+	<!-- Prod profile -->
+	<springProfile name="prod">
+		<appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<file>${LOG_DIR}/jellydrop.log</file>
+			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<fileNamePattern>${LOG_DIR}/jellydrop.%d{yyyy-MM-dd}.log</fileNamePattern>
+				<maxHistory>30</maxHistory>
+			</rollingPolicy>
+			<encoder>
+				<pattern>${LOG_PATTERN}</pattern>
+			</encoder>
+		</appender>
+
+		<root level="INFO">
+			<appender-ref ref="ROLLING" />
+		</root>
+	</springProfile>
 
 </configuration>
 
