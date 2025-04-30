@@ -1,7 +1,7 @@
 package slavinn.io.jellydrop;
 
 import java.io.IOException;
-
+import java.nio.file.StandardCopyOption;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +31,6 @@ public class UploadController {
 	}
 
 	@PostMapping("/upload")
-
 	public ResponseEntity<?> handleFileUplaod(@RequestParam("file") MultipartFile file,
 			@RequestParam("contentType") String contentType) {
 		Map<String, String> response = new HashMap<>();
@@ -39,15 +38,13 @@ public class UploadController {
 		Path tempFile = Paths.get("/tmp/" + file.getOriginalFilename());
 		try {
 			file.transferTo(tempFile);
-			System.out.println(tempFile);
 
-			System.out.println(contentType);
+			Path destinationFolder = Paths
+					.get(getDestinationFolder(contentType));
 
-			String destinationFolder = getDestinationFolder(contentType);
-			// Files.move(Paths.get(tempFile.toString()), Paths.get(destinationFolder));
-			System.out.println(destinationFolder);
-			System.out.println(Paths.get(tempFile.toString()));
-			System.out.println(Paths.get(destinationFolder));
+			Path targetFile = destinationFolder.resolve(file.getOriginalFilename());
+
+			Files.move(tempFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
 			response.put("message", "File uploaded and saved successfully.");
 
 			return ResponseEntity.ok(response);
@@ -57,7 +54,7 @@ public class UploadController {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 						.body(response);
 			} else {
-				response.put("error", "Error saving file");
+				response.put("error", "Error saving file:\n" + e.toString());
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 						.body(response);
 			}
