@@ -19,7 +19,7 @@ public class MediaPaths {
 	}
 
 	public String getShows() {
-		return this.shows
+		return this.shows;
 	}
 
 	public void setShows(String showsPath) {
